@@ -23,5 +23,10 @@ enum LocalConfig implements Config {
     return "user111";
   }
 
+  @Override
+  public String ghUrl() {
+    return "https://api.github.com/";
+  }
+
 
 }
