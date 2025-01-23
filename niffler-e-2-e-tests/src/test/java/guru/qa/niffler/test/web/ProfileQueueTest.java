@@ -9,23 +9,28 @@ import static guru.qa.niffler.jupiter.extension.UsersQueueExtension.*;
 @ExtendWith(UsersQueueExtension.class)
 public class ProfileQueueTest {
 
-    @Test
-    void testWithEmptyUser1(@UserType(empty = true) StaticUser user0,
-                            @UserType(empty = false) StaticUser user1) throws InterruptedException {
-        Thread.sleep(1000);
-        System.out.println(user0);
-        System.out.println(user1);
-    }
-
+    //первая часть домашней работы, возможно понадобится еще
 //    @Test
-//    void testWithEmptyUser2(@UserType(empty = false) StaticUser user) throws InterruptedException {
+//    void testWithEmptyUser1(@UserType(empty = true) StaticUser user0,
+//                            @UserType(empty = false) StaticUser user1) throws InterruptedException {
 //        Thread.sleep(1000);
-//        System.out.println(user);
+//        System.out.println(user0);
+//        System.out.println(user1);
 //    }
 //
 //    @Test
-//    void testWithEmptyUser(@UserType(empty = true) StaticUser user) throws InterruptedException {
+//    void testWithEmptyUser2(@UserType(empty = true) StaticUser user0,
+//                            @UserType(empty = false) StaticUser user1) throws InterruptedException {
 //        Thread.sleep(1000);
-//        System.out.println(user);
+//        System.out.println(user0);
+//        System.out.println(user1);
+//    }
+//
+//    @Test
+//    void testWithEmptyUser(@UserType(empty = true) StaticUser user0,
+//                           @UserType(empty = false) StaticUser user1) throws InterruptedException {
+//        Thread.sleep(1000);
+//        System.out.println(user0);
+//        System.out.println(user1);
 //    }
 }
