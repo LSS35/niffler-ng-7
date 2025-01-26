@@ -2,6 +2,7 @@ package guru.qa.niffler.jupiter.extension;
 
 import io.qameta.allure.Allure;
 import org.apache.commons.lang3.time.StopWatch;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
@@ -61,16 +62,7 @@ public class UsersQueueExtension implements
                             StopWatch sw = StopWatch.createStarted();
                             while (user.isEmpty() && sw.getTime(TimeUnit.SECONDS) < 30) {
                                 user = Optional.ofNullable(
-                                        switch(ut.value()) {
-                                            case EMPTY:
-                                                yield EMPTY_USERS.poll();
-                                            case WITH_FRIEND:
-                                                yield WITH_FRIEND_USERS.poll();
-                                            case WITH_INCOME_REQUEST:
-                                                yield WITH_INCOME_REQUEST_USERS.poll();
-                                            case WITH_OUTCOME_REQUEST:
-                                                yield WITH_OUTCOME_REQUEST_USERS.poll();
-                                        });
+                                        getQueue(ut).poll());
                             }
                             Allure.getLifecycle().updateStep(testCase -> {
                                 testCase.setStart(new Date().getTime());
@@ -91,26 +83,23 @@ public class UsersQueueExtension implements
                 );
     }
 
+    private Queue<StaticUser> getQueue(UserType ut) {
+        return switch (ut.value()) {
+            case EMPTY -> EMPTY_USERS;
+            case WITH_FRIEND -> WITH_FRIEND_USERS;
+            case WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST_USERS;
+            case WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST_USERS;
+            default -> throw new IllegalStateException("Can't find user type");
+        };
+    }
+
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
         Map<UserType, StaticUser> map = context.getStore(NAMESPACE).get(context.getUniqueId(), Map.class);
 
         if (map == null) return;
         map.forEach((ut, user) -> {
-            switch(ut.value()) {
-                case EMPTY:
-                    EMPTY_USERS.add(user);
-                    break;
-                case WITH_FRIEND:
-                     WITH_FRIEND_USERS.add(user);
-                    break;
-                case WITH_INCOME_REQUEST:
-                     WITH_INCOME_REQUEST_USERS.add(user);
-                    break;
-                case WITH_OUTCOME_REQUEST:
-                     WITH_OUTCOME_REQUEST_USERS.add(user);
-                    break;
-            }
+            getQueue(ut).add(user);
         });
     }
 

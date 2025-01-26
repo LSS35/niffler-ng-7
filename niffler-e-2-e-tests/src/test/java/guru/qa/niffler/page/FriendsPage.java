@@ -14,9 +14,9 @@ public class FriendsPage {
 
     public FriendsPage checkIncomeInvitation(String friendName) {
         SelenideElement requestRow = tableRequests.$$("tr").find(text(friendName));
-        requestRow.should(visible);
-        requestRow.shouldHave(text("Accept"));
-        requestRow.shouldHave(text("Decline"));
+        requestRow.should(visible)
+        .shouldHave(text("Accept"))
+        .shouldHave(text("Decline"));
         return this;
     }
 
