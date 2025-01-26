@@ -10,6 +10,8 @@ public class HeaderComponent {
     private final SelenideElement menuButton = $("header button[aria-label='Menu']");
     private final SelenideElement newSpendingHref = $("a[href='/spending']");
     private final SelenideElement menuProfile = $("a[href='/profile']");
+    private final SelenideElement allPeopleMenu = $("a[href='/people/all']");
+    private final SelenideElement friendsMenu = $("a[href='/people/friends']");
 
     public HeaderComponent menuClick() {
         menuButton.should(visible);
@@ -21,6 +23,18 @@ public class HeaderComponent {
         menuProfile.should(visible);
         menuProfile.click();
         return new ProfilePage();
+    }
+
+    public AllPeoplePage toAllPeople() {
+        allPeopleMenu.should(visible);
+        allPeopleMenu.click();
+        return new AllPeoplePage();
+    }
+
+    public FriendsPage toFriends() {
+        friendsMenu.should(visible);
+        friendsMenu.click();
+        return new FriendsPage();
     }
 
 }

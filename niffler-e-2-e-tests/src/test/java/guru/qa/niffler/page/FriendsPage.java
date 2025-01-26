@@ -1,0 +1,36 @@
+package guru.qa.niffler.page;
+
+import com.codeborne.selenide.SelenideElement;
+
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
+
+public class FriendsPage {
+    private final SelenideElement tableFriends = $("tbody#friends");
+    private final SelenideElement tableRequests = $("tbody#requests");
+    private final SelenideElement mainContainer = $(".MuiTableContainer-root");
+
+    private static final String EMPTY_MESSAGE = "There are no users yet";
+
+    public FriendsPage checkIncomeInvitation(String friendName) {
+        tableRequests.$$("tr").find(text(friendName))
+                .should(visible)
+                .shouldHave(text("Accept"))
+                .shouldHave(text("Decline"));
+        return this;
+    }
+
+    public FriendsPage checkEmptyTable() {
+        tableRequests.should(not(exist));
+        tableFriends.should(not(exist));
+        mainContainer.shouldHave(text(EMPTY_MESSAGE));
+        return this;
+    }
+
+    public FriendsPage checkFriendExists(String friendName) {
+        tableFriends.$$("tr").find(text(friendName))
+                .should(visible)
+                .shouldHave(text("Unfriend"));
+        return this;
+    }
+}
