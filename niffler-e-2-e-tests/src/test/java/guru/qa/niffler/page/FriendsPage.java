@@ -28,9 +28,9 @@ public class FriendsPage {
     }
 
     public FriendsPage checkFriendExists(String friendName) {
-        SelenideElement friendRow = tableFriends.$$("tr").find(text(friendName));
-        friendRow.should(visible);
-        friendRow.shouldHave(text("Unfriend"));
+        tableFriends.$$("tr").find(text(friendName))
+                .should(visible)
+                .shouldHave(text("Unfriend"));
         return this;
     }
 }
