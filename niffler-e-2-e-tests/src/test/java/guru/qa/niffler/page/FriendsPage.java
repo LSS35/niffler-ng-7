@@ -13,10 +13,10 @@ public class FriendsPage {
     private static final String EMPTY_MESSAGE = "There are no users yet";
 
     public FriendsPage checkIncomeInvitation(String friendName) {
-        SelenideElement requestRow = tableRequests.$$("tr").find(text(friendName));
-        requestRow.should(visible)
-        .shouldHave(text("Accept"))
-        .shouldHave(text("Decline"));
+        tableRequests.$$("tr").find(text(friendName))
+                .should(visible)
+                .shouldHave(text("Accept"))
+                .shouldHave(text("Decline"));
         return this;
     }
 
