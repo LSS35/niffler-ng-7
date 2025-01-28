@@ -15,4 +15,10 @@ public interface Config {
   String password();
 
   String ghUrl();
+
+  String authUrl();
+
+  String gatewayUrl();
+
+  String userdataUrl();
 }

@@ -1,9 +1,9 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.SpendApiClient;
-import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.meta.User;
 import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.util.DataHelper;
+import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
@@ -14,18 +14,19 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), Category.class)
+        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
+                .filter(annoUser -> annoUser.categories().length > 0)
                 .ifPresent(anno -> {
                             CategoryJson category = new CategoryJson(
                                     null,
-                                    DataHelper.randomCategory(),
+                                    RandomDataUtils.randomCategoryName(),
                                     anno.username(),
                                     false
                             );
                             CategoryJson categoryAdded = spendApiClient.addCategories(category);
 
                             //если нужно архивную, то редактируем новую категорию
-                            if (anno.archived()) {
+                            if (anno.categories()[0].archived()) {
                                 CategoryJson archivedCategory = new CategoryJson(
                                         categoryAdded.id(),
                                         categoryAdded.name(),
@@ -40,14 +41,12 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
                                     categoryAdded
                             );
                         }
-
                 );
     }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return parameterContext.getParameter().getType().isAssignableFrom(CategoryJson.class);
-
     }
 
     @Override
@@ -56,8 +55,10 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
     }
 
     @Override
-    public void afterTestExecution(ExtensionContext context) throws Exception {
+    public void afterTestExecution(ExtensionContext context) {
         CategoryJson category = context.getStore(CategoryExtension.NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
+
+        if (category == null) return;
         if (!category.archived()) {
             CategoryJson archiveCategory = new CategoryJson(
                     category.id(),
