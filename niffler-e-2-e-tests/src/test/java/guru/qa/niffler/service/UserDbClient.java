@@ -4,14 +4,12 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.Databases;
 import guru.qa.niffler.data.dao.impl.*;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
-import guru.qa.niffler.data.entity.spend.CategoryEntity;
-import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
-import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 
 import static guru.qa.niffler.data.Databases.transaction;
 import static guru.qa.niffler.data.Databases.xaTransaction;
+import static java.sql.Connection.TRANSACTION_READ_UNCOMMITTED;
 
 public class UserDbClient {
     private static final Config CFG = Config.getInstance();
@@ -39,6 +37,6 @@ public class UserDbClient {
                 CFG.authJdbcUrl()
         );
 
-        return xaTransaction(xaFunctionAuth, xaFunctionUserData);
+        return xaTransaction(TRANSACTION_READ_UNCOMMITTED, xaFunctionAuth, xaFunctionUserData);
     }
 }

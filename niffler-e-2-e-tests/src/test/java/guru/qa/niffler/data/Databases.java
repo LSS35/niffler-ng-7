@@ -5,7 +5,6 @@ import com.atomikos.jdbc.AtomikosDataSourceBean;
 import jakarta.transaction.SystemException;
 import jakarta.transaction.UserTransaction;
 import org.apache.commons.lang3.StringUtils;
-import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -48,10 +47,11 @@ public class Databases {
         );
     }
 
-    public static <T> T transaction(Function<Connection, T> function, String jdbcUrl) {
+    public static <T> T transaction(int isolationLevel, Function<Connection, T> function, String jdbcUrl) {
         Connection connection = null;
         try {
             connection = connection(jdbcUrl);
+            connection.setTransactionIsolation(isolationLevel);
             connection.setAutoCommit(false);
             T result = function.apply(connection);
             connection.commit();
@@ -70,12 +70,13 @@ public class Databases {
         }
     }
 
-    public static <T> T xaTransaction(XaFunction<T>... actions) {
+    public static <T> T xaTransaction(int isolationLevel, XaFunction<T>... actions) {
         UserTransaction ut = new UserTransactionImp();
         try {
             ut.begin();
             T result = null;
             for (XaFunction<T> action : actions) {
+                connection(action.jdbcUrl).setTransactionIsolation(isolationLevel);
                 result = action.function.apply(connection(action.jdbcUrl));
             }
             ut.commit();
@@ -90,10 +91,11 @@ public class Databases {
         }
     }
 
-    public static void transaction(Consumer<Connection> consumer, String jdbcUrl) {
+    public static void transaction(int isolationLevel, Consumer<Connection> consumer, String jdbcUrl) {
         Connection connection = null;
         try {
             connection = connection(jdbcUrl);
+            connection.setTransactionIsolation(isolationLevel);
             connection.setAutoCommit(false);
             consumer.accept(connection);
             connection.commit();
@@ -111,11 +113,12 @@ public class Databases {
         }
     }
 
-    public static void xaTransaction(XaConsumer... actions) {
+    public static void xaTransaction(int isolationLevel, XaConsumer... actions) {
         UserTransaction ut = new UserTransactionImp();
         try {
             ut.begin();
             for (XaConsumer action : actions) {
+                connection(action.jdbcUrl).setTransactionIsolation(isolationLevel);
                 action.function.accept(connection(action.jdbcUrl));
             }
             ut.commit();

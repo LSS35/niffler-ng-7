@@ -24,7 +24,7 @@ public class SimpleTest {
                 new UserJson(
                         null,
                         username,
-                        RandomDataUtils.randomName(),
+                        "SuccessJdbc" + RandomDataUtils.randomName(),
                         RandomDataUtils.randomSurname(),
                         RandomDataUtils.randomSentence(2),
                         CurrencyValues.RUB,
@@ -42,7 +42,7 @@ public class SimpleTest {
                         )
                 )
         );
-
+        System.out.println(user.toString());
         assertNotNull(user.id()); //возвращается часть Userdata и если есть id значит создалась запись
     }
 
@@ -50,28 +50,32 @@ public class SimpleTest {
     void xaTransactionsWrongDataTest() {
         UserDbClient userDbClient = new UserDbClient();
         String username = RandomDataUtils.randomUsername();
-
-        UserJson user = userDbClient.createUser(
-                new UserJson(
-                        null,
-                        username + "failed",
-                        RandomDataUtils.randomName(),
-                        RandomDataUtils.randomSurname(),
-                        RandomDataUtils.randomSentence(2),
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        new AuthJson(
-                                null,
-                                RandomDataUtils.randomString(266, 267), //превышает допустимую длину
-                                RandomDataUtils.randomSentence(1),
-                                true,
-                                true,
-                                true,
-                                true,
-                                Arrays.asList(Authority.read, Authority.write)
-                        )
-                )
-        );
+        try {
+            UserJson user = userDbClient.createUser(
+                    new UserJson(
+                            null,
+                            "failed." + username,
+                            RandomDataUtils.randomString(266, 267),//превышает допустимую длину
+                            RandomDataUtils.randomSurname(),
+                            RandomDataUtils.randomSentence(2),
+                            CurrencyValues.RUB,
+                            null,
+                            null,
+                            new AuthJson(
+                                    null,
+                                    "failed." + username,
+                                    RandomDataUtils.randomSentence(1),
+                                    true,
+                                    true,
+                                    true,
+                                    true,
+                                    Arrays.asList(Authority.read, Authority.write)
+                            )
+                    )
+            );
+            System.out.println(user.toString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

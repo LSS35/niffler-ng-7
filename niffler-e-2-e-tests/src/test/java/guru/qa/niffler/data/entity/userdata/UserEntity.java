@@ -31,8 +31,8 @@ public class UserEntity implements Serializable {
         ue.setCurrency(json.currency());
         ue.setFirstname(json.firstname());
         ue.setFullname(json.fullname());
-        ue.setPhoto(json.photo().getBytes(StandardCharsets.UTF_8));
-        ue.setPhotoSmall(json.photoSmall().getBytes(StandardCharsets.UTF_8));
+        ue.setPhoto(json.photo() != null && !json.photo().isEmpty() ? json.photo().getBytes(StandardCharsets.UTF_8) : null);
+        ue.setPhotoSmall(json.photoSmall() != null && !json.photoSmall().isEmpty() ? json.photoSmall().getBytes(StandardCharsets.UTF_8) : null);
 
         return ue;
     }

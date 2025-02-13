@@ -25,7 +25,7 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
                         "VALUES (?, ?)",
                 Statement.RETURN_GENERATED_KEYS)) {
             ps.setObject(1, authorityEntity.getUser().getId());
-            ps.setObject(2, authorityEntity.getAuthority());
+            ps.setString(2, authorityEntity.getAuthority().name());
 
             ps.executeUpdate();
 
@@ -38,6 +38,7 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
                 }
             }
             authorityEntity.setId(generatedKey);
+            System.out.println("AuthAuthorityDaoJdbc created: " + authorityEntity.getUser().getId());
             return authorityEntity;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -54,7 +55,7 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
             ps.setObject(1, authUserEntity.getId()); //1 одинаковый, 2 меняется
 
             for (AuthorityEntity authorityEntity : authUserEntity.getAuthorities()) {
-                ps.setObject(2, authorityEntity.getAuthority());
+                ps.setString(2, authorityEntity.getAuthority().name());
                 ps.addBatch();
             }
 

@@ -44,6 +44,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
                 }
             }
             userEntity.setId(generatedKey);
+            System.out.println("AuthUserDaoJdbc created: id = " + userEntity.getId() + ", username = " + userEntity.getUsername());
             return userEntity;
         } catch (SQLException e) {
             throw new RuntimeException(e);

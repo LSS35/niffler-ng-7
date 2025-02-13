@@ -43,6 +43,7 @@ public class UserdataUserDAOJdbc implements UserdataUserDAO {
                 }
             }
             user.setId(generatedKey);
+            System.out.println("UserdataUserDAOJdbc created:" + user.toString());
             return user;
         } catch (SQLException e) {
             throw new RuntimeException(e);
