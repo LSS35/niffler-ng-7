@@ -27,4 +27,6 @@ public interface Config {
     String spendJdbcUrl();
 
     String currencyJdbcUrl();
+
+    String authJdbcUrl();
 }
