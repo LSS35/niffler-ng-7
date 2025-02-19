@@ -7,6 +7,8 @@ import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
@@ -46,20 +48,44 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
     }
 
     @Override
-    public void create(AuthUserEntity authUserEntity) {
+    public void create(AuthorityEntity... authority) {
         try (PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO authority (user_id, authority) " +
                         "VALUES (?, ?)",
                 Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setObject(1, authUserEntity.getId()); //1 одинаковый, 2 меняется
-
-            for (AuthorityEntity authorityEntity : authUserEntity.getAuthorities()) {
+            for (AuthorityEntity authorityEntity : authority) {
+                ps.setObject(1, authorityEntity.getUser().getId());
                 ps.setString(2, authorityEntity.getAuthority().name());
                 ps.addBatch();
             }
 
             ps.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<AuthorityEntity> findAll() {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM authority"
+        )) {
+            ps.execute();
+            List<AuthorityEntity> list = new ArrayList<>();
+            try (ResultSet rs = ps.getResultSet()) {
+                while (rs.next()) {
+                    AuthorityEntity ae = new AuthorityEntity();
+                    AuthUserEntity aue = new AuthUserEntity();
+                    ae.setId(rs.getObject("id", UUID.class));
+                    ae.setAuthority(rs.getObject("authority", Authority.class));
+                    aue.setId(rs.getObject("user_id", UUID.class));
+                    ae.setUser(aue);
+
+                    list.add(ae);
+                }
+                return list;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

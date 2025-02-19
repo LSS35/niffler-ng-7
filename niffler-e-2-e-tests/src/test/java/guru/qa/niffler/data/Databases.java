@@ -28,7 +28,7 @@ public class Databases {
     public record XaConsumer(Consumer<Connection> function, String jdbcUrl) {
     }
 
-    private static DataSource dataSource(String jdbcUrl) {
+    public static DataSource dataSource(String jdbcUrl) {
         return datasources.computeIfAbsent(
                 jdbcUrl,
                 key -> {

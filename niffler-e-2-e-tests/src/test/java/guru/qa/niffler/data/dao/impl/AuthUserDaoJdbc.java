@@ -7,6 +7,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class AuthUserDaoJdbc implements AuthUserDao {
@@ -46,6 +49,59 @@ public class AuthUserDaoJdbc implements AuthUserDao {
             userEntity.setId(generatedKey);
             System.out.println("AuthUserDaoJdbc created: id = " + userEntity.getId() + ", username = " + userEntity.getUsername());
             return userEntity;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<AuthUserEntity> findById(UUID id) {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM \"user\" WHERE id = ?"
+        )) {
+            ps.setObject(1, id);
+            ps.execute();
+            try (ResultSet rs = ps.getResultSet()) {
+                if (rs.next()) {
+                    AuthUserEntity aue = new AuthUserEntity();
+                    aue.setId(rs.getObject("id", UUID.class));
+                    aue.setUsername(rs.getString("username"));
+                    aue.setPassword(rs.getString("password"));
+                    aue.setEnabled(rs.getBoolean("enabled"));
+                    aue.setEnabled(rs.getBoolean("account_non_expired"));
+                    aue.setEnabled(rs.getBoolean("account_non_locked"));
+                    aue.setEnabled(rs.getBoolean("credentials_non_expired"));
+                    return Optional.of(aue);
+                } else {
+                    return Optional.empty();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<AuthUserEntity> findAll() {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM \"user\""
+        )) {
+            ps.execute();
+            List<AuthUserEntity> userEntityList = new ArrayList<>();
+            try (ResultSet rs = ps.getResultSet()) {
+                while (rs.next()) {
+                    AuthUserEntity aue = new AuthUserEntity();
+                    aue.setId(rs.getObject("id", UUID.class));
+                    aue.setUsername(rs.getString("username"));
+                    aue.setPassword(rs.getString("password"));
+                    aue.setEnabled(rs.getBoolean("enabled"));
+                    aue.setEnabled(rs.getBoolean("account_non_expired"));
+                    aue.setEnabled(rs.getBoolean("account_non_locked"));
+                    aue.setEnabled(rs.getBoolean("credentials_non_expired"));
+                    userEntityList.add(aue);
+                }
+                return userEntityList;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
