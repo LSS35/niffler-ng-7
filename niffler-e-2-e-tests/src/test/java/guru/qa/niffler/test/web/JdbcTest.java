@@ -96,4 +96,25 @@ public class JdbcTest {
         );
         System.out.println(user);
     }
+
+    @Test
+    void springJdbcTxChainedTest() {
+        //не откатывает успешно выполненные действия.
+        // то есть пользователь остается в БД auth в таблице user при не возможности вставки в следующих действиях
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUserByTxChained(
+                new UserJson(
+                        null,
+                        "valentin-Ch-5",
+                        null,//RandomDataUtils.randomString(266, 267),//превышает допустимую длину
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+        System.out.println(user);
+    }
 }
