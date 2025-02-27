@@ -79,7 +79,81 @@ public class UserDbClient {
                     udUserDaoSpring.create(UserEntity.fromJson(user))
             );
         });
+    }
 
+    public UserJson createUserSpringWithoutTx(UserJson user) {
+
+            AuthUserEntity authUser = new AuthUserEntity();
+            authUser.setUsername(user.username());
+            authUser.setPassword(pe.encode("12345"));
+            authUser.setEnabled(true);
+            authUser.setAccountNonExpired(true);
+            authUser.setAccountNonLocked(true);
+            authUser.setCredentialsNonExpired(true);
+
+            AuthUserEntity createdAuthUser = authUserDaoSpring.create(authUser);
+
+            AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(e -> {
+                AuthorityEntity ae = new AuthorityEntity();
+                ae.setUser(createdAuthUser);
+                ae.setAuthority(e);
+                return ae;
+            }).toArray(AuthorityEntity[]::new);
+
+            authAuthorityDaoSpring.create(authorityEntities);
+            return UserJson.fromUserEntity(
+                    udUserDaoSpring.create(UserEntity.fromJson(user))
+            );
+    }
+
+    public UserJson createUserJdbc(UserJson user) {
+        return xaTransactionTemplate.execute(() -> {
+            AuthUserEntity authUser = new AuthUserEntity();
+            authUser.setUsername(user.username());
+            authUser.setPassword(pe.encode("12345"));
+            authUser.setEnabled(true);
+            authUser.setAccountNonExpired(true);
+            authUser.setAccountNonLocked(true);
+            authUser.setCredentialsNonExpired(true);
+
+            AuthUserEntity createdAuthUser = authUserDao.create(authUser);
+
+            AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(e -> {
+                AuthorityEntity ae = new AuthorityEntity();
+                ae.setUser(createdAuthUser);
+                ae.setAuthority(e);
+                return ae;
+            }).toArray(AuthorityEntity[]::new);
+
+            authAuthorityDao.create(authorityEntities);
+            return UserJson.fromUserEntity(
+                    udUserDao.create(UserEntity.fromJson(user))
+            );
+        });
+    }
+
+    public UserJson createUserJdbcWithoutTx(UserJson user) {
+            AuthUserEntity authUser = new AuthUserEntity();
+            authUser.setUsername(user.username());
+            authUser.setPassword(pe.encode("12345"));
+            authUser.setEnabled(true);
+            authUser.setAccountNonExpired(true);
+            authUser.setAccountNonLocked(true);
+            authUser.setCredentialsNonExpired(true);
+
+            AuthUserEntity createdAuthUser = authUserDao.create(authUser);
+
+            AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(e -> {
+                AuthorityEntity ae = new AuthorityEntity();
+                ae.setUser(createdAuthUser);
+                ae.setAuthority(e);
+                return ae;
+            }).toArray(AuthorityEntity[]::new);
+
+            authAuthorityDao.create(authorityEntities);
+            return UserJson.fromUserEntity(
+                    udUserDao.create(UserEntity.fromJson(user))
+            );
     }
 
     public UserJson createUserByTxChained(UserJson user) {
