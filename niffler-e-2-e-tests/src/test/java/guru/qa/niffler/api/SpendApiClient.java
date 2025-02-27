@@ -7,7 +7,6 @@ import guru.qa.niffler.model.SpendJson;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-import retrofit2.http.Query;
 
 import java.io.IOException;
 import java.util.Date;

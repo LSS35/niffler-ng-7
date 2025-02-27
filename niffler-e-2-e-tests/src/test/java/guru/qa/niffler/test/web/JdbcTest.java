@@ -10,10 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SimpleTest {
+public class JdbcTest {
 
     @Test
     void xaTransactionsCorrectDataTest() {
@@ -82,11 +81,11 @@ public class SimpleTest {
     @Test
     void springJdbcTest() {
         UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbc(
+        UserJson user = usersDbClient.createUser(
                 new UserJson(
                         null,
-                        "valentin-5",
-                        null,
+                        "valentin-3",
+                        RandomDataUtils.randomString(266, 267),//превышает допустимую длину
                         null,
                         null,
                         CurrencyValues.RUB,
