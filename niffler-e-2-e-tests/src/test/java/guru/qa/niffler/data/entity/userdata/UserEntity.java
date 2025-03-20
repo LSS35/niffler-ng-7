@@ -1,9 +1,6 @@
 package guru.qa.niffler.data.entity.userdata;
 
-import guru.qa.niffler.data.entity.spend.CategoryEntity;
-import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import lombok.Getter;
 import lombok.Setter;

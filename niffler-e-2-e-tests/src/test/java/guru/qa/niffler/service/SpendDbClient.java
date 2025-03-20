@@ -1,58 +1,63 @@
 package guru.qa.niffler.service;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.CategoryDao;
+import guru.qa.niffler.data.dao.SpendDao;
 import guru.qa.niffler.data.dao.impl.CategoryDaoJdbc;
 import guru.qa.niffler.data.dao.impl.SpendDaoJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 
 import java.util.Optional;
 
-import static guru.qa.niffler.data.Databases.transaction;
 import static java.sql.Connection.TRANSACTION_READ_UNCOMMITTED;
 
 public class SpendDbClient {
     private static final Config CFG = Config.getInstance();
     public static final int ISOLATION_LEVEL = TRANSACTION_READ_UNCOMMITTED;
 
+    private final CategoryDao categoryDao = new CategoryDaoJdbc();
+    private final SpendDao spendDao = new SpendDaoJdbc();
+
+    private final JdbcTransactionTemplate jdbcTxTemplate = new JdbcTransactionTemplate(
+            CFG.spendJdbcUrl()
+    );
+
     public SpendJson createSpend(SpendJson spendJson) {
-        return transaction(ISOLATION_LEVEL, connection -> {
+        return jdbcTxTemplate.execute(() -> {
                     SpendEntity spendEntity = SpendEntity.fromJson(spendJson);
                     if (spendEntity.getCategory().getId() == null) {
-                        CategoryEntity categoryEntity = new CategoryDaoJdbc(connection).create(spendEntity.getCategory());
+                        CategoryEntity categoryEntity = categoryDao.create(spendEntity.getCategory());
                         spendEntity.setCategory(categoryEntity);
                     }
-                    return SpendJson.fromEntity(new SpendDaoJdbc(connection).create(spendEntity));
-                },
-                CFG.spendJdbcUrl()
+                    return SpendJson.fromEntity(spendDao.create(spendEntity));
+                }
         );
     }
 
     public CategoryJson addCategories(CategoryJson categoryJson) {
-        return transaction(ISOLATION_LEVEL, connection -> {
-                    return CategoryJson.fromEntity(new CategoryDaoJdbc(connection).create(CategoryEntity.fromJson(categoryJson)));
-                },
-                CFG.spendJdbcUrl()
+        return jdbcTxTemplate.execute(() -> {
+                    return CategoryJson.fromEntity(categoryDao.create(CategoryEntity.fromJson(categoryJson)));
+                }
         );
     }
 
     public CategoryJson updateCategory(CategoryJson categoryJson) {
-        return transaction(ISOLATION_LEVEL, connection -> {
-                    return CategoryJson.fromEntity(new CategoryDaoJdbc(connection).update(CategoryEntity.fromJson(categoryJson)));
-                },
-                CFG.spendJdbcUrl()
+        return jdbcTxTemplate.execute(() -> {
+                    return CategoryJson.fromEntity(categoryDao.update(CategoryEntity.fromJson(categoryJson)));
+                }
         );
     }
 
     public Optional<CategoryJson> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
-        return transaction(ISOLATION_LEVEL, connection -> {
-                    Optional<CategoryEntity> findedCategory = new CategoryDaoJdbc(connection).findCategoryByUsernameAndCategoryName(username, categoryName);
+        return jdbcTxTemplate.execute(() -> {
+                    Optional<CategoryEntity> findedCategory = categoryDao.findCategoryByUsernameAndCategoryName(username, categoryName);
 
                     return findedCategory.map(CategoryJson::fromEntity).stream().findFirst();
-                },
-                CFG.spendJdbcUrl()
+                }
         );
     }
 }

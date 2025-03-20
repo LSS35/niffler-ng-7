@@ -10,10 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SimpleTest {
+public class JdbcTest {
 
     @Test
     void xaTransactionsCorrectDataTest() {
@@ -82,11 +81,32 @@ public class SimpleTest {
     @Test
     void springJdbcTest() {
         UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbc(
+        UserJson user = usersDbClient.createUser(
                 new UserJson(
                         null,
-                        "valentin-5",
+                        "valentin-3",
+                        RandomDataUtils.randomString(266, 267),//превышает допустимую длину
                         null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+        System.out.println(user);
+    }
+
+    @Test
+    void springJdbcTxChainedTest() {
+        //не откатывает успешно выполненные действия.
+        // то есть пользователь остается в БД auth в таблице user при не возможности вставки в следующих действиях
+        UserDbClient usersDbClient = new UserDbClient();
+        UserJson user = usersDbClient.createUserByTxChained(
+                new UserJson(
+                        null,
+                        "valentin-Ch-5",
+                        null,//RandomDataUtils.randomString(266, 267),//превышает допустимую длину
                         null,
                         null,
                         CurrencyValues.RUB,
